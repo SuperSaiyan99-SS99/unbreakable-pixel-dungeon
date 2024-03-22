@@ -1,19 +1,29 @@
 apply plugin: 'com.android.application'
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
+    signingConfigs {
+        UnbreakablePixelDungeon {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
     compileSdkVersion 24
     buildToolsVersion '26.0.2'
-
     defaultConfig {
         applicationId "com.watabou.unbreakablepixeldungeon"
         minSdkVersion 9
         targetSdkVersion 24
     }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            signingConfig signingConfigs.UnbreakablePixelDungeon
         }
     }
 }
