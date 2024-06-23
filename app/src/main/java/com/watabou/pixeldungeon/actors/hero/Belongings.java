@@ -17,6 +17,7 @@
  */
 package com.watabou.pixeldungeon.actors.hero;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.watabou.pixeldungeon.Badges;
@@ -104,6 +105,20 @@ public class Belongings implements Iterable<Item> {
 		}
 		
 		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public<T extends Item> ArrayList<T> getItems( Class<T> itemClass ) {
+		
+		ArrayList<T> items = new ArrayList<>();
+		
+		for (Item item : this) {
+			if (itemClass.isInstance( item )) {
+				items.add( (T)item );
+			}
+		}
+		
+		return items;
 	}
 	
 	@SuppressWarnings("unchecked")

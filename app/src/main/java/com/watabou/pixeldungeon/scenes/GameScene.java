@@ -69,7 +69,6 @@ import com.watabou.pixeldungeon.ui.Toast;
 import com.watabou.pixeldungeon.ui.Toolbar;
 import com.watabou.pixeldungeon.ui.Window;
 import com.watabou.pixeldungeon.utils.GLog;
-import com.watabou.pixeldungeon.windows.WndBag.Mode;
 import com.watabou.pixeldungeon.windows.WndGame;
 import com.watabou.pixeldungeon.windows.WndBag;
 import com.watabou.pixeldungeon.windows.WndStory;
@@ -347,7 +346,7 @@ public class GameScene extends PixelScene {
 			
 		super.update();
 		
-		water.offset( 0, -5 * Game.elapsed );
+		water.offset( 0, -4 * Game.elapsed );
 		
 		Actor.process();
 		
@@ -596,9 +595,18 @@ public class GameScene extends PixelScene {
 	public static WndBag selectItem( WndBag.Listener listener, WndBag.Mode mode, String title ) {
 		cancelCellSelector();
 		
-		WndBag wnd = mode == Mode.SEED ?
-			WndBag.seedPouch( listener, mode, title ) :
-			WndBag.lastBag( listener, mode, title );
+		WndBag wnd;
+		switch (mode) {
+			case SEED:
+				wnd = WndBag.seedPouch( listener, mode, title );
+				break;
+			case WAND:
+				wnd = WndBag.wandHolster( listener, mode, title );
+				break;
+			default:
+				wnd = WndBag.lastBag( listener, mode, title );
+				break;
+		}
 		scene.add( wnd );
 		
 		return wnd;
