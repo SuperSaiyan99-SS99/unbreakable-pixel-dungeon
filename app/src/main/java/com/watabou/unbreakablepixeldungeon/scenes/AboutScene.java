@@ -28,12 +28,23 @@ import com.watabou.noosa.Image;
 import com.watabou.noosa.TouchArea;
 import com.watabou.unbreakablepixeldungeon.UnbreakablePixelDungeon;
 import com.watabou.unbreakablepixeldungeon.effects.Flare;
+import com.watabou.unbreakablepixeldungeon.sprites.ItemSprite;
+import com.watabou.unbreakablepixeldungeon.sprites.ItemSpriteSheet;
 import com.watabou.unbreakablepixeldungeon.ui.Archs;
 import com.watabou.unbreakablepixeldungeon.ui.ExitButton;
 import com.watabou.unbreakablepixeldungeon.ui.Icons;
 import com.watabou.unbreakablepixeldungeon.ui.Window;
 
 public class AboutScene extends PixelScene {
+	
+	private static final String UNBREAKABLE_TTL = "Unbreakable";
+	
+	private static final String UNBREAKABLE_TXT =
+		"Modifications: SuperSaiyan99\n\n" +
+		"This mod removes the degradation from items " +
+		"and its related features.";
+	
+	private static final String TTL = "Pixel Dungeon";
 
 	private static final String TXT = 
 		"Code & graphics: Watabou\n" +
@@ -44,26 +55,39 @@ public class AboutScene extends PixelScene {
 	
 	private static final String LNK = "pixeldungeon.watabou.ru";
 	
+	private static final float GAP = 26;
+	
 	@Override
 	public void create() {
 		super.create();
 		
+		float col;
+		float colOffset;
+		
+		if (UnbreakablePixelDungeon.landscape()) {
+			col = Camera.main.width / 2f;
+			colOffset = col;
+		} else {
+			col = Camera.main.width;
+			colOffset = 0;
+		}
+		
+		BitmapTextMultiline title = createMultiline( TTL, 8 );
+		title.maxWidth = Math.min( (int)col, 120 );
+		title.measure();
+		title.hardlight( Window.TITLE_COLOR );
+		add( title );
+		
 		BitmapTextMultiline text = createMultiline( TXT, 8 );
-		text.maxWidth = Math.min( Camera.main.width, 120 );
+		text.maxWidth = title.maxWidth;
 		text.measure();
 		add( text );
 		
-		text.x = align( (Camera.main.width - text.width()) / 2 );
-		text.y = align( (Camera.main.height - text.height()) / 2 );
-		
 		BitmapTextMultiline link = createMultiline( LNK, 8 );
-		link.maxWidth = Math.min( Camera.main.width, 120 );
+		link.maxWidth = title.maxWidth;
 		link.measure();
 		link.hardlight( Window.TITLE_COLOR );
 		add( link );
-		
-		link.x = text.x;
-		link.y = text.y + text.height();
 		
 		TouchArea hotArea = new TouchArea( link ) {
 			@Override
@@ -75,10 +99,49 @@ public class AboutScene extends PixelScene {
 		add( hotArea );
 		
 		Image wata = Icons.WATA.get();
-		wata.x = align( (Camera.main.width - wata.width) / 2 );
-		wata.y = text.y - wata.height - 8;
 		add( wata );
 		
+		BitmapTextMultiline unbreakableTitle = createMultiline( UNBREAKABLE_TTL, 8 );
+		unbreakableTitle.maxWidth = title.maxWidth;
+		unbreakableTitle.measure();
+		unbreakableTitle.hardlight( 0xD6A07A );
+		add( unbreakableTitle );
+		
+		BitmapTextMultiline unbreakableText = createMultiline( UNBREAKABLE_TXT, 8 );
+		unbreakableText.maxWidth = title.maxWidth;
+		unbreakableText.measure();
+		add( unbreakableText );
+		
+		Image unbreakableChest = new ItemSprite( ItemSpriteSheet.LOCKED_CHEST, new ItemSprite.Glowing( 0xCC8888 ) );
+		add( unbreakableChest );
+		
+		float totalHeight = UnbreakablePixelDungeon.landscape() ?
+			title.height() + GAP + text.height() + link.height() :
+			unbreakableTitle.height() + GAP + unbreakableText.height() + GAP + title.height() + GAP + text.height() + link.height();
+		float vertMargin =  (Camera.main.height - totalHeight) / 2;
+		
+		unbreakableTitle.x = align( (col - unbreakableTitle.width()) / 2 );
+		unbreakableTitle.y = align( vertMargin );
+		
+		unbreakableChest.x = align( (col - unbreakableChest.width) / 2 );
+		unbreakableChest.y = unbreakableTitle.y + unbreakableTitle.height() + (GAP - unbreakableChest.height) / 2;
+		
+		unbreakableText.x = align( (col - unbreakableText.width()) / 2 );
+		unbreakableText.y = unbreakableTitle.y + unbreakableTitle.height() + GAP;
+		
+		title.x = align( colOffset + (col - title.width()) / 2 );
+		title.y = UnbreakablePixelDungeon.landscape() ? align( vertMargin ) : unbreakableText.y + unbreakableText.height() + GAP;
+		
+		wata.x = align( colOffset + (col - wata.width) / 2 );
+		wata.y = title.y + title.height() + (GAP - wata.height) / 2;
+		
+		text.x = align( colOffset + (col - text.width()) / 2 );
+		text.y = title.y + title.height() + GAP;
+		
+		link.x = text.x;
+		link.y = text.y + text.height();
+		
+		new Flare( 7, 64 ).color( 0x332222, true ).show( unbreakableChest, 0 ).angularSpeed = +20;
 		new Flare( 7, 64 ).color( 0x112233, true ).show( wata, 0 ).angularSpeed = +20;
 		
 		Archs archs = new Archs();
